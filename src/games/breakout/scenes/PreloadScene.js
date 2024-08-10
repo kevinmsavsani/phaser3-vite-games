@@ -11,10 +11,11 @@ class PreloadScene extends Phaser.Scene {
       "assets/games/breakout/breakout.png",
       "assets/games/breakout/breakout.json"
     );
+    this.load.image('background', 'assets/games/breakout/background.png');
   }
 
   create() {
-    this.scene.start("GameScene");
+    this.scene.start('GameScene');
   }
 }
 
