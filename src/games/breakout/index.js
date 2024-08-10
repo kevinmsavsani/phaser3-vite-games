@@ -4,13 +4,11 @@ import Phaser from 'phaser';
 
 import GameScene from './scenes/GameScene';
 import PreloadScene from './scenes/PreloadScene';
-
-const WIDTH = 540;
-const HEIGHT = 750;
+import { GAME_CONFIG } from './constant';
 
 const SHARED_CONFIG = {
-  width: WIDTH,
-  height: HEIGHT,
+  width: GAME_CONFIG.WIDTH,
+  height: GAME_CONFIG.HEIGHT,
 }
 
 const Scenes = [PreloadScene,GameScene];
