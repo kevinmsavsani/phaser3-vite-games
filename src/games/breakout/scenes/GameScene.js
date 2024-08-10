@@ -36,12 +36,20 @@ class GameScene extends Phaser.Scene {
       .setVisible(false); // Top
 
     this.customBounds
-      .create(GAME_CONFIG.BOX_X - GAME_CONFIG.BOX_WIDTH / 2, GAME_CONFIG.BOX_Y + GAME_CONFIG.BOX_HEIGHT / 2, null)
+      .create(
+        GAME_CONFIG.BOX_X - GAME_CONFIG.BOX_WIDTH / 2,
+        GAME_CONFIG.BOX_Y + GAME_CONFIG.BOX_HEIGHT / 2,
+        null
+      )
       .setSize(10, GAME_CONFIG.BOX_HEIGHT)
       .setVisible(false); // Left
 
     this.customBounds
-      .create(GAME_CONFIG.BOX_X + GAME_CONFIG.BOX_WIDTH / 2, GAME_CONFIG.BOX_Y + GAME_CONFIG.BOX_HEIGHT / 2, null)
+      .create(
+        GAME_CONFIG.BOX_X + GAME_CONFIG.BOX_WIDTH / 2,
+        GAME_CONFIG.BOX_Y + GAME_CONFIG.BOX_HEIGHT / 2,
+        null
+      )
       .setSize(10, GAME_CONFIG.BOX_HEIGHT)
       .setVisible(false); // Right
 
@@ -49,7 +57,12 @@ class GameScene extends Phaser.Scene {
 
     // Ball setup
     this.ball = this.physics.add
-      .image(GAME_CONFIG.BALL_START_X, GAME_CONFIG.BALL_START_Y, "assets", "ball1")
+      .image(
+        GAME_CONFIG.BALL_START_X,
+        GAME_CONFIG.BALL_START_Y,
+        "assets",
+        "ball1"
+      )
       .setCollideWorldBounds(false) // Disable world bounds collision
       .setBounce(1)
       .setDisplaySize(GAME_CONFIG.BALL_WIDTH, GAME_CONFIG.BALL_HEIGHT); // Set the width and height of the ball
@@ -57,13 +70,30 @@ class GameScene extends Phaser.Scene {
 
     // Paddle setup
     this.paddle = this.physics.add
-      .image(GAME_CONFIG.PADDLE_START_X, GAME_CONFIG.PADDLE_START_Y, "assets", "paddle1")
+      .image(
+        GAME_CONFIG.PADDLE_START_X,
+        GAME_CONFIG.PADDLE_START_Y,
+        "assets",
+        "paddle1"
+      )
       .setDisplaySize(GAME_CONFIG.PADDLE_WIDTH, GAME_CONFIG.PADDLE_HEIGHT) // Set the width and height of the paddle
       .setImmovable();
 
     // Colliders
-    this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
-    this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
+    this.physics.add.collider(
+      this.ball,
+      this.bricks,
+      this.hitBrick,
+      null,
+      this
+    );
+    this.physics.add.collider(
+      this.ball,
+      this.paddle,
+      this.hitPaddle,
+      null,
+      this
+    );
     this.physics.add.collider(this.ball, this.customBounds);
 
     // Input handlers
@@ -87,7 +117,10 @@ class GameScene extends Phaser.Scene {
       "pointerup",
       function () {
         if (this.ball.getData("onPaddle")) {
-          this.ball.setVelocity(this.roundConfig.ballVelocityX, this.roundConfig.ballVelocityY);
+          this.ball.setVelocity(
+            this.roundConfig.ballVelocityX,
+            this.roundConfig.ballVelocityY
+          );
           this.ball.setData("onPaddle", false);
         }
       },
@@ -95,22 +128,37 @@ class GameScene extends Phaser.Scene {
     );
 
     // Create and display the score text
-    this.scoreText = this.add.text(GAME_CONFIG.SCORE_TEXT_X, GAME_CONFIG.SCORE_TEXT_Y, "0", {
-      fontSize: GAME_CONFIG.SCORE_TEXT_FONT_SIZE,
-      fill: GAME_CONFIG.SCORE_TEXT_COLOR,
-    });
+    this.scoreText = this.add.text(
+      GAME_CONFIG.SCORE_TEXT_X,
+      GAME_CONFIG.SCORE_TEXT_Y,
+      "0",
+      {
+        fontSize: GAME_CONFIG.SCORE_TEXT_FONT_SIZE,
+        fill: GAME_CONFIG.SCORE_TEXT_COLOR,
+      }
+    );
 
     // Create and display the highest score text
-    this.highestScoreText = this.add.text(GAME_CONFIG.HIGHEST_SCORE_TEXT_X, GAME_CONFIG.HIGHEST_SCORE_TEXT_Y, "0", {
-      fontSize: GAME_CONFIG.HIGHEST_SCORE_TEXT_FONT_SIZE,
-      fill: GAME_CONFIG.HIGHEST_SCORE_TEXT_COLOR,
-    });
+    this.highestScoreText = this.add.text(
+      GAME_CONFIG.HIGHEST_SCORE_TEXT_X,
+      GAME_CONFIG.HIGHEST_SCORE_TEXT_Y,
+      "0",
+      {
+        fontSize: GAME_CONFIG.HIGHEST_SCORE_TEXT_FONT_SIZE,
+        fill: GAME_CONFIG.HIGHEST_SCORE_TEXT_COLOR,
+      }
+    );
 
     // Create and display the round text
-    this.roundText = this.add.text(GAME_CONFIG.ROUND_TEXT_X, GAME_CONFIG.ROUND_TEXT_Y, `${this.currentRound}/${this.totalRounds}`, {
-      fontSize: GAME_CONFIG.ROUND_TEXT_FONT_SIZE,
-      fill: GAME_CONFIG.ROUND_TEXT_COLOR,
-    });
+    this.roundText = this.add.text(
+      GAME_CONFIG.ROUND_TEXT_X,
+      GAME_CONFIG.ROUND_TEXT_Y,
+      `${this.currentRound}/${this.totalRounds}`,
+      {
+        fontSize: GAME_CONFIG.ROUND_TEXT_FONT_SIZE,
+        fill: GAME_CONFIG.ROUND_TEXT_COLOR,
+      }
+    );
 
     // Initialize the life images
     this.updateLivesDisplay();
@@ -122,7 +170,14 @@ class GameScene extends Phaser.Scene {
 
     // Create the bricks with round-specific configuration
     this.createBricks(this.roundConfig.brickGrid);
-    if(this.ball && this.bricks) this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
+    if (this.ball && this.bricks)
+      this.physics.add.collider(
+        this.ball,
+        this.bricks,
+        this.hitBrick,
+        null,
+        this
+      );
   }
 
   createBricks(gridConfig) {
@@ -237,7 +292,10 @@ class GameScene extends Phaser.Scene {
         "assets",
         "paddle1"
       );
-      lifeImage.setDisplaySize(GAME_CONFIG.LIFE_IMAGE_WIDTH, GAME_CONFIG.LIFE_IMAGE_HEIGHT);
+      lifeImage.setDisplaySize(
+        GAME_CONFIG.LIFE_IMAGE_WIDTH,
+        GAME_CONFIG.LIFE_IMAGE_HEIGHT
+      );
       lifeImage.setAngle(GAME_CONFIG.LIFE_IMAGE_ANGLE); // Tilt the image
       this.lifeImages.push(lifeImage);
     }
