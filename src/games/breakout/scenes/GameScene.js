@@ -1,8 +1,8 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
 
 class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'GameScene' });
+    super({ key: "GameScene" });
 
     this.bricks;
     this.paddle;
@@ -11,7 +11,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(0, 0, 'background').setOrigin(0);
+    this.add.image(0, 0, "background").setOrigin(0);
 
     // Set up world bounds but disable collision on the bottom as before
     this.physics.world.setBoundsCollision(true, true, true, false);
@@ -26,14 +26,23 @@ class GameScene extends Phaser.Scene {
     this.customBounds = this.physics.add.staticGroup();
 
     // Create individual walls for the box
-    this.customBounds.create(boxX, boxY, null).setSize(boxWidth, 10).setVisible(false); // Top
-    this.customBounds.create(boxX - boxWidth / 2, boxY + boxHeight / 2, null).setSize(10, boxHeight).setVisible(false); // Left
-    this.customBounds.create(boxX + boxWidth / 2, boxY + boxHeight / 2, null).setSize(10, boxHeight).setVisible(false); // Right
+    this.customBounds
+      .create(boxX, boxY, null)
+      .setSize(boxWidth, 10)
+      .setVisible(false); // Top
+    this.customBounds
+      .create(boxX - boxWidth / 2, boxY + boxHeight / 2, null)
+      .setSize(10, boxHeight)
+      .setVisible(false); // Left
+    this.customBounds
+      .create(boxX + boxWidth / 2, boxY + boxHeight / 2, null)
+      .setSize(10, boxHeight)
+      .setVisible(false); // Right
 
     // Bricks setup
     this.bricks = this.physics.add.staticGroup({
-      key: 'assets',
-      frame: ['blue1', 'red1', 'green1', 'yellow1', 'silver1', 'purple1'],
+      key: "assets",
+      frame: ["blue1", "red1", "green1", "yellow1", "silver1", "purple1"],
       frameQuantity: 10,
       gridAlign: {
         width: 10,
@@ -47,28 +56,44 @@ class GameScene extends Phaser.Scene {
 
     // Ball setup
     this.ball = this.physics.add
-      .image(300, 605, 'assets', 'ball1')
+      .image(300, 605, "assets", "ball1")
       .setCollideWorldBounds(false) // Disable world bounds collision
       .setBounce(1);
-    this.ball.setData('onPaddle', true);
+    this.ball.setData("onPaddle", true);
 
     // Paddle setup
     this.paddle = this.physics.add
-      .image(300, 640, 'assets', 'paddle1')
+      .image(300, 640, "assets", "paddle1")
       .setImmovable();
 
     // Colliders
-    this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
-    this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
+    this.physics.add.collider(
+      this.ball,
+      this.bricks,
+      this.hitBrick,
+      null,
+      this
+    );
+    this.physics.add.collider(
+      this.ball,
+      this.paddle,
+      this.hitPaddle,
+      null,
+      this
+    );
     this.physics.add.collider(this.ball, this.customBounds); // Collide with the custom bounds
 
     // Input handlers
     this.input.on(
-      'pointermove',
+      "pointermove",
       function (pointer) {
-        this.paddle.x = Phaser.Math.Clamp(pointer.x, boxX - boxWidth / 2 + this.paddle.width / 2, boxX + boxWidth / 2 - this.paddle.width / 2);
+        this.paddle.x = Phaser.Math.Clamp(
+          pointer.x,
+          boxX - boxWidth / 2 + this.paddle.width / 2,
+          boxX + boxWidth / 2 - this.paddle.width / 2
+        );
 
-        if (this.ball.getData('onPaddle')) {
+        if (this.ball.getData("onPaddle")) {
           this.ball.x = this.paddle.x;
         }
       },
@@ -76,11 +101,11 @@ class GameScene extends Phaser.Scene {
     );
 
     this.input.on(
-      'pointerup',
+      "pointerup",
       function (pointer) {
-        if (this.ball.getData('onPaddle')) {
+        if (this.ball.getData("onPaddle")) {
           this.ball.setVelocity(-75, -300);
-          this.ball.setData('onPaddle', false);
+          this.ball.setData("onPaddle", false);
         }
       },
       this
@@ -98,7 +123,7 @@ class GameScene extends Phaser.Scene {
   resetBall() {
     this.ball.setVelocity(0);
     this.ball.setPosition(this.paddle.x, 605);
-    this.ball.setData('onPaddle', true);
+    this.ball.setData("onPaddle", true);
   }
 
   resetLevel() {
