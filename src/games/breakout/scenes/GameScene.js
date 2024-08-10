@@ -47,7 +47,7 @@ class GameScene extends Phaser.Scene {
 
     // Ball setup
     this.ball = this.physics.add
-      .image(300, 615, 'assets', 'ball1')
+      .image(300, 605, 'assets', 'ball1')
       .setCollideWorldBounds(false) // Disable world bounds collision
       .setBounce(1);
     this.ball.setData('onPaddle', true);
@@ -97,7 +97,7 @@ class GameScene extends Phaser.Scene {
 
   resetBall() {
     this.ball.setVelocity(0);
-    this.ball.setPosition(this.paddle.x, 615);
+    this.ball.setPosition(this.paddle.x, 605);
     this.ball.setData('onPaddle', true);
   }
 
