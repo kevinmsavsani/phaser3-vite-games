@@ -15,6 +15,9 @@ class GameScene extends Phaser.Scene {
     this.highestScoreText; // Variable to hold the highest score text
     this.lives = 2; // Initialize the number of lives
     this.lifeImages = []; // Array to store life images
+    this.currentRound = 1; // Initialize the current round
+    this.totalRounds = 2; // Define the total number of rounds
+    this.roundText; // Variable to hold the round text
   }
 
   create() {
@@ -42,32 +45,7 @@ class GameScene extends Phaser.Scene {
       .setSize(10, GAME_CONFIG.BOX_HEIGHT)
       .setVisible(false); // Right
 
-    // Create the static group
-    this.bricks = this.physics.add.staticGroup({
-      key: "assets",
-      frame: ["blue1", "red1", "green1", "yellow1", "silver1", "purple1"],
-      frameQuantity: 10,
-      gridAlign: {
-        width: GAME_CONFIG.BRICK_GRID_WIDTH,
-        height: GAME_CONFIG.BRICK_GRID_HEIGHT,
-        cellWidth: GAME_CONFIG.BRICK_CELL_WIDTH,
-        cellHeight: GAME_CONFIG.BRICK_CELL_HEIGHT,
-        x: GAME_CONFIG.BRICK_GRID_START_X,
-        y: GAME_CONFIG.BRICK_GRID_START_Y,
-      },
-    });
-
-    // Adjust the size and position of each frame
-    this.bricks.children.iterate(function (brick) {
-      const frameKey = brick.frame.name;
-      const { width, height } = FRAME_DIMENSIONS[frameKey];
-      // Set the display size of the brick
-      brick.displayWidth = width;
-      brick.displayHeight = height;
-
-      // Adjust the position if necessary
-      brick.setOrigin(0.5, 0.5); // Optional: set origin to center
-    });
+    this.createBricks();
 
     // Ball setup
     this.ball = this.physics.add
@@ -83,7 +61,7 @@ class GameScene extends Phaser.Scene {
       .setDisplaySize(GAME_CONFIG.PADDLE_WIDTH, GAME_CONFIG.PADDLE_HEIGHT) // Set the width and height of the paddle
       .setImmovable();
 
-     // Colliders
+    // Colliders
      this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
     this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
     this.physics.add.collider(this.ball, this.customBounds);
@@ -117,19 +95,51 @@ class GameScene extends Phaser.Scene {
     );
 
     // Create and display the score text
-    this.scoreText = this.add.text(GAME_CONFIG.SCORE_TEXT_X, GAME_CONFIG.SCORE_TEXT_Y, '0', {
+    this.scoreText = this.add.text(GAME_CONFIG.SCORE_TEXT_X, GAME_CONFIG.SCORE_TEXT_Y, "0", {
       fontSize: GAME_CONFIG.SCORE_TEXT_FONT_SIZE,
       fill: GAME_CONFIG.SCORE_TEXT_COLOR,
     });
 
     // Create and display the highest score text
-    this.highestScoreText = this.add.text(GAME_CONFIG.HIGHEST_SCORE_TEXT_X, GAME_CONFIG.HIGHEST_SCORE_TEXT_Y, '0', {
+    this.highestScoreText = this.add.text(GAME_CONFIG.HIGHEST_SCORE_TEXT_X, GAME_CONFIG.HIGHEST_SCORE_TEXT_Y, "0", {
       fontSize: GAME_CONFIG.HIGHEST_SCORE_TEXT_FONT_SIZE,
       fill: GAME_CONFIG.HIGHEST_SCORE_TEXT_COLOR,
     });
 
+    // Create and display the round text
+    this.roundText = this.add.text(GAME_CONFIG.ROUND_TEXT_X, GAME_CONFIG.ROUND_TEXT_Y, `${this.currentRound}/${this.totalRounds}`, {
+      fontSize: GAME_CONFIG.ROUND_TEXT_FONT_SIZE,
+      fill: GAME_CONFIG.ROUND_TEXT_COLOR,
+    });
+
     // Initialize the life images
     this.updateLivesDisplay();
+  }
+
+  createBricks() {
+    // Create the static group for bricks
+    this.bricks = this.physics.add.staticGroup({
+      key: "assets",
+      frame: ["blue1", "red1", "green1", "yellow1", "silver1", "purple1"],
+      frameQuantity: 1,
+      gridAlign: {
+        width: GAME_CONFIG.BRICK_GRID_WIDTH,
+        height: GAME_CONFIG.BRICK_GRID_HEIGHT,
+        cellWidth: GAME_CONFIG.BRICK_CELL_WIDTH,
+        cellHeight: GAME_CONFIG.BRICK_CELL_HEIGHT,
+        x: GAME_CONFIG.BRICK_GRID_START_X,
+        y: GAME_CONFIG.BRICK_GRID_START_Y,
+      },
+    });
+
+    // Adjust the size and position of each frame
+    this.bricks.children.iterate(function (brick) {
+      const frameKey = brick.frame.name;
+      const { width, height } = FRAME_DIMENSIONS[frameKey];
+      brick.displayWidth = width;
+      brick.displayHeight = height;
+      brick.setOrigin(0.5, 0.5); // Optional: set origin to center
+    });
   }
 
   hitBrick(ball, brick) {
@@ -139,15 +149,24 @@ class GameScene extends Phaser.Scene {
     this.updateScore(10);
 
     if (this.bricks.countActive() === 0) {
-      this.resetLevel();
+      if (this.currentRound < this.totalRounds) {
+        this.nextRound();
+      } else {
+        this.gameOver();
+      }
     }
+  }
+
+  nextRound() {
+    this.currentRound++;
+    this.roundText.setText(`${this.currentRound}/${this.totalRounds}`);
+    this.resetLevel();
   }
 
   updateScore(amount) {
     this.score += amount;
     this.scoreText.setText(this.score);
 
-    // Update the highest score if the current score is higher
     if (this.score > this.highestScore) {
       this.highestScore = this.score;
       this.highestScoreText.setText(this.highestScore);
@@ -224,8 +243,11 @@ class GameScene extends Phaser.Scene {
     this.highestScoreText.setText(this.highestScore);
 
     // Reset lives and update display
-    this.lives = 3;
+    this.lives = 2;
     this.updateLivesDisplay();
+
+    this.currentRound = 1; // Reset to first round
+    this.roundText.setText(`${this.currentRound}/${this.totalRounds}`);
 
     // Restart the level
     this.resetLevel();
