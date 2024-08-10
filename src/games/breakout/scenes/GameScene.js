@@ -19,7 +19,7 @@ class GameScene extends Phaser.Scene {
     this.totalRounds = ROUND_CONFIG.length; // Define the total number of rounds
     this.roundText; // Variable to hold the round text
   }
-
+  
   create() {
     this.add.image(0, 0, "background").setOrigin(0);
 
@@ -169,7 +169,7 @@ class GameScene extends Phaser.Scene {
     this.roundConfig = ROUND_CONFIG[this.currentRound - 1];
 
     // Create the bricks with round-specific configuration
-    this.createBricks(this.roundConfig.brickGrid);
+    this.createBricks(this.roundConfig.brickConfig, this.roundConfig.brickGrid);
     if (this.ball && this.bricks)
       this.physics.add.collider(
         this.ball,
@@ -179,32 +179,50 @@ class GameScene extends Phaser.Scene {
         this
       );
   }
-
-  createBricks(gridConfig) {
+  createBricks(brickConfig, bricksGrid) {
     // Create the static group for bricks
-    this.bricks = this.physics.add.staticGroup({
-      key: "assets",
-      frame: gridConfig.frames,
-      frameQuantity: gridConfig.frameQuantity,
-      gridAlign: {
-        width: gridConfig.width,
-        height: gridConfig.height,
-        cellWidth: gridConfig.cellWidth,
-        cellHeight: gridConfig.cellHeight,
-        x: gridConfig.startX,
-        y: gridConfig.startY,
-      },
-    });
-
-    // Adjust the size and position of each frame
+    this.bricks = this.physics.add.staticGroup();
+  
+    // Define the grid align configuration
+    const gridAlignConfig = {
+      width: brickConfig.width, // Number of bricks per row
+      height: brickConfig.height, // Number of rows
+      cellWidth: brickConfig.cellWidth, // Width of each cell
+      cellHeight: brickConfig.cellHeight, // Height of each cell
+      x: brickConfig.startX, // X position of the grid start
+      y: brickConfig.startY, // Y position of the grid start
+    };
+  
+    // Iterate over each row and column to create bricks
+    for (let row = 0; row < brickConfig.height; row++) {
+      for (let col = 0; col < brickConfig.width; col++) {
+        // Calculate the x and y position for each brick
+        const x = gridAlignConfig.x + col * gridAlignConfig.cellWidth;
+        const y = gridAlignConfig.y + row * gridAlignConfig.cellHeight;
+  
+        // Get the frame key from the bricksGrid configuration
+        const frameKey = bricksGrid[row][col];
+        
+        if(frameKey) {
+        // Create a new brick and set its position
+        this.bricks.create(x, y, "assets", frameKey)
+          .setOrigin(0.5, 0.5) // Center the origin of the brick
+          .setSize(brickConfig.cellWidth, brickConfig.cellHeight) // Set the size of the brick
+          .setDisplaySize(brickConfig.cellWidth, brickConfig.cellHeight); // Ensure the brick displays at the correct size
+        }
+      }
+    }
+  
+    // Optionally adjust the size and position of each frame if needed
     this.bricks.children.iterate(function (brick) {
       const frameKey = brick.frame.name;
       const { width, height } = FRAME_DIMENSIONS[frameKey];
       brick.displayWidth = width;
       brick.displayHeight = height;
-      brick.setOrigin(0.5, 0.5); // Optional: set origin to center
     });
   }
+  
+  
 
   hitBrick(ball, brick) {
     brick.disableBody(true, true);

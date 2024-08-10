@@ -66,29 +66,27 @@ export const FRAME_DIMENSIONS = {
   purple1: { width: 32, height: 16 },
 };
 
-// roundConfig.js
-
-export const ROUND_CONFIG = [
+const BASE_ROUND_CONFIG = [
   {
     round: 1,
     ballVelocityX: -300,
     ballVelocityY: -300,
-    brickGrid: {
-      width: 3,
-      height: 2,
-      startX: 100,
+    brickConfig: {
+      width: 5,
+      height: 4,
+      startX: 200,
       startY: 200,
       cellWidth: 32,
       cellHeight: 16,
-      frames: ["blue1", "red1", "green1"],
-      frameQuantity: 2
+      frames: ["blue1", "red1"],
+      frameQuantity: 10
     },
   },
   {
     round: 2,
     ballVelocityX: -500,
     ballVelocityY: -500,
-    brickGrid: {
+    brickConfig: {
       width: 5,
       height: 3,
       startX: 80,
@@ -99,5 +97,38 @@ export const ROUND_CONFIG = [
       frameQuantity: 5
     },
   },
-  // Add more rounds here with different configurations
 ];
+
+const generateBrickGrid = (config) => {
+  const { width, height, frames, frameQuantity } = config.brickConfig;
+
+  const totalCells = width * height;
+  const totalFrames = frames.length * frameQuantity;
+  const totalNulls = totalCells - totalFrames;
+
+  // Create an array containing the frames and null values
+  const elements = [
+    ...frames.flatMap(frame => Array(frameQuantity).fill(frame)),
+    ...Array(totalNulls).fill(null),
+  ];
+
+  // Shuffle the elements array
+  for (let i = elements.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [elements[i], elements[j]] = [elements[j], elements[i]];
+  }
+
+  // Convert the shuffled array into a 2D grid
+  const grid = [];
+  for (let i = 0; i < height; i++) {
+    grid.push(elements.slice(i * width, (i + 1) * width));
+  }
+
+  return grid;
+};
+
+
+export const ROUND_CONFIG = BASE_ROUND_CONFIG.map(config => ({
+  ...config,
+  brickGrid: generateBrickGrid(config),
+}));
