@@ -65,3 +65,39 @@ export const FRAME_DIMENSIONS = {
   silver1: { width: 32, height: 16 },
   purple1: { width: 32, height: 16 },
 };
+
+// roundConfig.js
+
+export const ROUND_CONFIG = [
+  {
+    round: 1,
+    ballVelocityX: -300,
+    ballVelocityY: -300,
+    brickGrid: {
+      width: 3,
+      height: 2,
+      startX: 100,
+      startY: 200,
+      cellWidth: 32,
+      cellHeight: 16,
+      frames: ["blue1", "red1", "green1"],
+      frameQuantity: 2
+    },
+  },
+  {
+    round: 2,
+    ballVelocityX: -500,
+    ballVelocityY: -500,
+    brickGrid: {
+      width: 5,
+      height: 3,
+      startX: 80,
+      startY: 180,
+      cellWidth: 32,
+      cellHeight: 16,
+      frames: ["yellow1", "silver1", "purple1"],
+      frameQuantity: 5
+    },
+  },
+  // Add more rounds here with different configurations
+];

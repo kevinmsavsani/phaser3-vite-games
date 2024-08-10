@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GAME_CONFIG, FRAME_DIMENSIONS } from "../constant";
+import { GAME_CONFIG, FRAME_DIMENSIONS, ROUND_CONFIG } from "../constant";
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +16,7 @@ class GameScene extends Phaser.Scene {
     this.lives = 2; // Initialize the number of lives
     this.lifeImages = []; // Array to store life images
     this.currentRound = 1; // Initialize the current round
-    this.totalRounds = 2; // Define the total number of rounds
+    this.totalRounds = ROUND_CONFIG.length; // Define the total number of rounds
     this.roundText; // Variable to hold the round text
   }
 
@@ -45,7 +45,7 @@ class GameScene extends Phaser.Scene {
       .setSize(10, GAME_CONFIG.BOX_HEIGHT)
       .setVisible(false); // Right
 
-    this.createBricks();
+    this.loadRoundConfig();
 
     // Ball setup
     this.ball = this.physics.add
@@ -62,7 +62,7 @@ class GameScene extends Phaser.Scene {
       .setImmovable();
 
     // Colliders
-     this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
+    this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
     this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
     this.physics.add.collider(this.ball, this.customBounds);
 
@@ -85,9 +85,9 @@ class GameScene extends Phaser.Scene {
 
     this.input.on(
       "pointerup",
-      function (pointer) {
+      function () {
         if (this.ball.getData("onPaddle")) {
-          this.ball.setVelocity(GAME_CONFIG.BALL_VELOCITY_X, GAME_CONFIG.BALL_VELOCITY_Y);
+          this.ball.setVelocity(this.roundConfig.ballVelocityX, this.roundConfig.ballVelocityY);
           this.ball.setData("onPaddle", false);
         }
       },
@@ -116,19 +116,28 @@ class GameScene extends Phaser.Scene {
     this.updateLivesDisplay();
   }
 
-  createBricks() {
+  loadRoundConfig() {
+    // Load the configuration for the current round
+    this.roundConfig = ROUND_CONFIG[this.currentRound - 1];
+
+    // Create the bricks with round-specific configuration
+    this.createBricks(this.roundConfig.brickGrid);
+    if(this.ball && this.bricks) this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
+  }
+
+  createBricks(gridConfig) {
     // Create the static group for bricks
     this.bricks = this.physics.add.staticGroup({
       key: "assets",
-      frame: ["blue1", "red1", "green1", "yellow1", "silver1", "purple1"],
-      frameQuantity: 1,
+      frame: gridConfig.frames,
+      frameQuantity: gridConfig.frameQuantity,
       gridAlign: {
-        width: GAME_CONFIG.BRICK_GRID_WIDTH,
-        height: GAME_CONFIG.BRICK_GRID_HEIGHT,
-        cellWidth: GAME_CONFIG.BRICK_CELL_WIDTH,
-        cellHeight: GAME_CONFIG.BRICK_CELL_HEIGHT,
-        x: GAME_CONFIG.BRICK_GRID_START_X,
-        y: GAME_CONFIG.BRICK_GRID_START_Y,
+        width: gridConfig.width,
+        height: gridConfig.height,
+        cellWidth: gridConfig.cellWidth,
+        cellHeight: gridConfig.cellHeight,
+        x: gridConfig.startX,
+        y: gridConfig.startY,
       },
     });
 
@@ -182,9 +191,8 @@ class GameScene extends Phaser.Scene {
   resetLevel() {
     this.resetBall();
 
-    this.bricks.children.each((brick) => {
-      brick.enableBody(false, 0, 0, true, true);
-    });
+    // Reload the round configuration
+    this.loadRoundConfig();
   }
 
   hitPaddle(ball, paddle) {
@@ -203,7 +211,7 @@ class GameScene extends Phaser.Scene {
 
   update() {
     if (this.ball.y > 800) {
-      this.lives--; // Decrease lives when ball falls off screen
+      this.lives--; // Decrease lives when the ball falls off the screen
       this.updateLivesDisplay();
 
       if (this.lives <= 0) {
@@ -246,7 +254,7 @@ class GameScene extends Phaser.Scene {
     this.lives = 2;
     this.updateLivesDisplay();
 
-    this.currentRound = 1; // Reset to first round
+    this.currentRound = 1; // Reset to the first round
     this.roundText.setText(`${this.currentRound}/${this.totalRounds}`);
 
     // Restart the level
