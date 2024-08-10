@@ -39,7 +39,7 @@ class GameScene extends Phaser.Scene {
       .setSize(10, boxHeight)
       .setVisible(false); // Right
 
-    // Bricks setup
+    // Create the static group
     this.bricks = this.physics.add.staticGroup({
       key: "assets",
       frame: ["blue1", "red1", "green1", "yellow1", "silver1", "purple1"],
@@ -49,9 +49,33 @@ class GameScene extends Phaser.Scene {
         height: 6,
         cellWidth: 32,
         cellHeight: 16,
-        x: 112,
+        x: 100,
         y: 200,
       },
+    });
+
+    // Define custom sizes for each frame
+    const frameDimensions = {
+      blue1: { width: 32, height: 16 },
+      red1: { width: 32, height: 16 },
+      green1: { width: 32, height: 16 },
+      yellow1: { width: 32, height: 16 },
+      silver1: { width: 32, height: 16 },
+      purple1: { width: 32, height: 16 },
+    };
+
+    // Adjust the size and position of each frame
+    this.bricks.children.iterate(function (brick) {
+      const frameKey = brick.frame.name;
+      const { width, height } = frameDimensions[frameKey];
+
+      // Set the display size of the brick
+      brick.displayWidth = width;
+      brick.displayHeight = height;
+
+      // Adjust the position if necessary
+      // Example: Centering the brick based on its dimensions
+      brick.setOrigin(0.5, 0.5); // Optional: set origin to center
     });
 
     // Ball setup
