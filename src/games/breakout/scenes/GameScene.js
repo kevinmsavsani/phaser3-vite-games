@@ -12,6 +12,8 @@ class GameScene extends Phaser.Scene {
     this.highestScore = 0; // Initialize the highest score
     this.scoreText; // Variable to hold the score text
     this.highestScoreText; // Variable to hold the highest score text
+    this.lives = 2; // Initialize the number of lives
+    this.lifeImages = []; // Array to store life images
   }
 
   create() {
@@ -92,7 +94,7 @@ class GameScene extends Phaser.Scene {
     // Paddle setup
     this.paddle = this.physics.add
       .image(300, 640, "assets", "paddle1")
-      .setDisplaySize(80, 20) // Set the width and height of the ball
+      .setDisplaySize(80, 20) // Set the width and height of the paddle
       .setImmovable();
 
     // Colliders
@@ -152,8 +154,8 @@ class GameScene extends Phaser.Scene {
       fill: '#fff'
     });
 
-    // Update the score text
-    this.updateScore(0);
+    // Initialize the life images
+    this.updateLivesDisplay();
   }
 
   hitBrick(ball, brick) {
@@ -208,8 +210,49 @@ class GameScene extends Phaser.Scene {
 
   update() {
     if (this.ball.y > 800) {
-      this.resetBall();
+      this.lives--; // Decrease lives when ball falls off screen
+      this.updateLivesDisplay();
+
+      if (this.lives <= 0) {
+        this.gameOver(); // End the game if no lives are left
+      } else {
+        this.resetBall(); // Reset the ball position
+      }
     }
+  }
+
+  updateLivesDisplay() {
+    // Clear existing life images
+    if (this.lifeImages.length > 0) {
+      this.lifeImages.forEach(lifeImage => lifeImage.destroy());
+      this.lifeImages = [];
+    }
+
+    // Create new life images
+    const startX = 84;
+    const startY = 700;
+    const spacing = 30;
+    for (let i = 0; i < this.lives; i++) {
+      const lifeImage = this.add.image(startX + i * spacing, startY, "assets", "paddle1");
+      lifeImage.setDisplaySize(30, 10);
+      lifeImage.setAngle(-45); // Tilt the image
+      this.lifeImages.push(lifeImage);
+    }
+  }
+
+  gameOver() {
+    // Reset the score and restart the level
+    this.score = 0;
+    this.highestScore = Math.max(this.highestScore, this.score);
+    this.scoreText.setText(this.score);
+    this.highestScoreText.setText(this.highestScore);
+
+    // Reset lives and update display
+    this.lives = 3;
+    this.updateLivesDisplay();
+
+    // Restart the level
+    this.resetLevel();
   }
 }
 
