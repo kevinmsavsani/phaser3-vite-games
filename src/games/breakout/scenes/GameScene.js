@@ -8,6 +8,10 @@ class GameScene extends Phaser.Scene {
     this.paddle;
     this.ball;
     this.customBounds;
+    this.score = 0; // Initialize the score
+    this.highestScore = 0; // Initialize the highest score
+    this.scoreText; // Variable to hold the score text
+    this.highestScoreText; // Variable to hold the highest score text
   }
 
   create() {
@@ -74,7 +78,6 @@ class GameScene extends Phaser.Scene {
       brick.displayHeight = height;
 
       // Adjust the position if necessary
-      // Example: Centering the brick based on its dimensions
       brick.setOrigin(0.5, 0.5); // Optional: set origin to center
     });
 
@@ -136,13 +139,42 @@ class GameScene extends Phaser.Scene {
       },
       this
     );
+
+    // Create and display the score text
+    this.scoreText = this.add.text(84, 48, '0', {
+      fontSize: '20px',
+      fill: '#fff'
+    });
+
+    // Create and display the highest score text
+    this.highestScoreText = this.add.text(140, 84, '0', {
+      fontSize: '14px',
+      fill: '#fff'
+    });
+
+    // Update the score text
+    this.updateScore(0);
   }
 
   hitBrick(ball, brick) {
     brick.disableBody(true, true);
 
+    // Increase score when a brick is hit
+    this.updateScore(10);
+
     if (this.bricks.countActive() === 0) {
       this.resetLevel();
+    }
+  }
+
+  updateScore(amount) {
+    this.score += amount;
+    this.scoreText.setText(this.score);
+
+    // Update the highest score if the current score is higher
+    if (this.score > this.highestScore) {
+      this.highestScore = this.score;
+      this.highestScoreText.setText(this.highestScore);
     }
   }
 
