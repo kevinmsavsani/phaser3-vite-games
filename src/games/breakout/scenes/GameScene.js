@@ -19,7 +19,7 @@ class GameScene extends Phaser.Scene {
     // Custom bounds (box) settings
     const boxX = 270;
     const boxY = 150;
-    const boxWidth = 460;
+    const boxWidth = 480;
     const boxHeight = 600;
 
     // Create an invisible box using physics bodies
@@ -82,12 +82,14 @@ class GameScene extends Phaser.Scene {
     this.ball = this.physics.add
       .image(300, 605, "assets", "ball1")
       .setCollideWorldBounds(false) // Disable world bounds collision
-      .setBounce(1);
+      .setBounce(1)
+      .setDisplaySize(15, 15); // Set the width and height of the ball
     this.ball.setData("onPaddle", true);
 
     // Paddle setup
     this.paddle = this.physics.add
       .image(300, 640, "assets", "paddle1")
+      .setDisplaySize(80, 20) // Set the width and height of the ball
       .setImmovable();
 
     // Colliders
